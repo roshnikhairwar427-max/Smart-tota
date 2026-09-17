@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Tota</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#74ebd5,#9face6);
+  font-family:Arial,sans-serif;
+}
+.app{
+  width:92%;
+  max-width:400px;
+  min-height:600px;
+  background:white;
+  border-radius:30px;
+  padding:25px;
+  text-align:center;
+  box-shadow:0 10px 30px #0004;
+}
+h1{
+  color:#159447;
+  margin:5px;
+}
+.tota{
+  font-size:130px;
+  margin:30px 0 10px;
+}
+.status{
+  font-size:18px;
+  color:#555;
+  min-height:30px;
+}
+button{
+  margin-top:25px;
+  padding:15px 25px;
+  border:0;
+  border-radius:30px;
+  background:#159447;
+  color:white;
+  font-size:18px;
+}
+button:active{
+  transform:scale(.95);
+}
+.answer{
+  margin-top:25px;
+  padding:15px;
+  background:#f1f1f1;
+  border-radius:15px;
+  min-height:60px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h1>🦜 Smart Tota</h1>
+
+  <div class="tota">🦜</div>
+
+  <div class="status" id="status">
+    बोलने के लिए बटन दबाएँ
+  </div>
+
+  <button onclick="startListening()">🎤 बोलें</button>
+
+  <div class="answer" id="answer">
+    नमस्ते! मैं Smart Tota हूँ।
+  </div>
+</div>
+
+<script>
+const statusText = document.getElementById("status");
+const answer = document.getElementById("answer");
+
+const SpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition;
+
+let recognition;
+
+if (SpeechRecognition) {
+
+  recognition = new SpeechRecognition();
+  recognition.lang = "hi-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = function(){
+    statusText.innerText = "🎤 मैं सुन रहा हूँ...";
+  };
+
+  recognition.onresult = function(event){
+
+    const text = event.results[0][0].transcript;
+
+    answer.innerText = "आपने कहा: " + text;
+
+    speakReply(text);
+  };
+
+  recognition.onerror = function(){
+    statusText.innerText =
+      "माइक की अनुमति दें और फिर कोशिश करें।";
+  };
+
+  recognition.onend = function(){
+    statusText.innerText = "फिर से बोलने के लिए बटन दबाएँ";
+  };
+
+} else {
+
+  statusText.innerText =
+    "यह ब्राउज़र Voice Recognition सपोर्ट नहीं करता।";
+}
+
+function startListening(){
+
+  if(recognition){
+    recognition.start();
+  }
+}
+
+function speakReply(text){
+
+  let reply = "";
+
+  text = text.toLowerCase();
+
+  if(text.includes("नमस्ते") || text.includes("हेलो")){
+    reply = "नमस्ते! मैं Smart Tota हूँ।";
+  }
+  else if(text.includes("तुम कौन हो")){
+    reply = "मैं आपका Smart Tota voice assistant हूँ।";
+  }
+  else if(text.includes("कैसे हो")){
+    reply = "मैं बिल्कुल ठीक हूँ।";
+  }
+  else if(text.includes("नाम")){
+    reply = "मेरा नाम Smart Tota है।";
+  }
+  else{
+    reply = "आपने कहा " + text + "।";
+  }
+
+  answer.innerText = reply;
+
+  const speech = new SpeechSynthesisUtterance(reply);
+  speech.lang = "hi-IN";
+  speech.rate = 0.9;
+  speech.pitch = 1.1;
+
+  window.speechSynthesis.speak(speech);
+}
+</script>
+
+</body>
+</html>
